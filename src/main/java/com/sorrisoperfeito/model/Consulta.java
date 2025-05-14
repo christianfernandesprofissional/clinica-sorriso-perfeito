@@ -17,17 +17,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "pacientes")
-public class Paciente {
+@Table(name = "consultas")
+public class Consulta {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idPaciente; 
-	
-	private String nome;
-	private String documento; 
-	private String telefone; 
-	private LocalDate nascimento; 
-	private String profissao; 
-	
+	private Integer idConsulta;
+	private Integer paciente; 
+	private Integer dentista; 
+	private LocalDate dataHora; 
+
 }

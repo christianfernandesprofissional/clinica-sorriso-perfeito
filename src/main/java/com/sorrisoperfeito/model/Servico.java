@@ -1,7 +1,5 @@
 package com.sorrisoperfeito.model;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,17 +15,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "pacientes")
-public class Paciente {
+@Table(name = "servicos")
+public class Servico {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idPaciente; 
-	
-	private String nome;
-	private String documento; 
-	private String telefone; 
-	private LocalDate nascimento; 
-	private String profissao; 
-	
+	private Integer idServico; 
+	private String descricao;
 }
