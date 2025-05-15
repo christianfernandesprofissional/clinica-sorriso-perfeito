@@ -1,11 +1,16 @@
 package com.sorrisoperfeito.model;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,9 +27,20 @@ public class Consulta {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idConsulta;
-	private Integer paciente; 
-	private Integer dentista; 
+	private Integer idConsulta;  
 	private LocalDate dataHora; 
 
+	@ManyToOne
+	@JoinColumn(name = "idPaciente")
+	private Paciente paciente;
+	
+	@ManyToOne
+	@JoinColumn(name = "idDentista")
+	private Dentista dentista;
+	
+	@ManyToMany
+	@JoinTable(name = "consultas_servicos",
+			   joinColumns = @JoinColumn(name = "idConsulta"),
+			   inverseJoinColumns = @JoinColumn(name = "idServico"))
+	private HashSet<Servico> servicos = new HashSet<>();
 }
