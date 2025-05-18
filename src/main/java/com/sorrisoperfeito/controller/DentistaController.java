@@ -2,6 +2,7 @@ package com.sorrisoperfeito.controller;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,26 +19,36 @@ import com.sorrisoperfeito.model.Dentista;
 import com.sorrisoperfeito.repository.DentistaRepository;
 
 @RestController
-@RequestMapping("/clinica")
+@RequestMapping("/dentistas")
 public class DentistaController {
 
 	@Autowired
 	private DentistaRepository dentistaRepository;
 	
-	@GetMapping("/dentistas")
+	@GetMapping
 	public ResponseEntity<List<Dentista>> findAll(){
 		List<Dentista> dentistas = dentistaRepository.findAll();
 		return ResponseEntity.ok(dentistas);
 	}
 	
-	@PostMapping("/dentista")
+	@GetMapping("/{id}")
+	public ResponseEntity<Dentista> findById(@PathVariable Integer id){
+		Optional<Dentista> dentista = dentistaRepository.findById(id);
+		if(dentista.isPresent()) {
+			return ResponseEntity.ok(dentista.get());
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	@PostMapping("/")
 	public ResponseEntity<Dentista> createDentista(@RequestBody Dentista dentista) {
 		 Dentista dentistaSalvo = dentistaRepository.save(dentista);
-		 URI location = URI.create("/dentista/" + dentistaSalvo.getIdDentista());
+		 URI location = URI.create("/dentistas/" + dentistaSalvo.getIdDentista());
 		 return ResponseEntity.created(location).body(dentistaSalvo);
 	}
 	
-	@PutMapping("/dentista/{id}")
+	@PutMapping("/{id}")
 	public ResponseEntity<Dentista> updateDentista(@PathVariable Integer id, @RequestBody Dentista dentista){
 		if(!dentistaRepository.existsById(id)) {
 			return ResponseEntity.notFound().build();
@@ -49,7 +60,7 @@ public class DentistaController {
 		
 	}
 	
-	@DeleteMapping("/dentista/{id}")
+	@DeleteMapping("/del/{id}")
 	public ResponseEntity<Dentista> deleteDentista(@PathVariable Integer id){
 		
 		if(!dentistaRepository.existsById(id)) {
