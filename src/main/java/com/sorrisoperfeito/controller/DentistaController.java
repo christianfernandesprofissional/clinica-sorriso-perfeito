@@ -15,25 +15,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sorrisoperfeito.exceptions.CadastroException;
 import com.sorrisoperfeito.model.Dentista;
-import com.sorrisoperfeito.repository.DentistaRepository;
+import com.sorrisoperfeito.service.DentistaService;
 
 @RestController
 @RequestMapping("/dentistas")
 public class DentistaController {
 
 	@Autowired
-	private DentistaRepository dentistaRepository;
+	private DentistaService dentistaService;
 	
 	@GetMapping
 	public ResponseEntity<List<Dentista>> findAll(){
-		List<Dentista> dentistas = dentistaRepository.findAll();
+		List<Dentista> dentistas = dentistaService.findAll();
 		return ResponseEntity.ok(dentistas);
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Dentista> findById(@PathVariable Integer id){
-		Optional<Dentista> dentista = dentistaRepository.findById(id);
+		Optional<Dentista> dentista = dentistaService.findById(id);
 		if(dentista.isPresent()) {
 			return ResponseEntity.ok(dentista.get());
 		}else {
@@ -43,19 +44,20 @@ public class DentistaController {
 	
 	@PostMapping("/")
 	public ResponseEntity<Dentista> createDentista(@RequestBody Dentista dentista) {
-		 Dentista dentistaSalvo = dentistaRepository.save(dentista);
+		try {
+		 Dentista dentistaSalvo = dentistaService.createDentista(dentista);
 		 URI location = URI.create("/dentistas/" + dentistaSalvo.getIdDentista());
 		 return ResponseEntity.created(location).body(dentistaSalvo);
+		}catch(CadastroException e) {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<Dentista> updateDentista(@PathVariable Integer id, @RequestBody Dentista dentista){
-		if(!dentistaRepository.existsById(id)) {
+		if(!dentistaService.updateDentista(id, dentista)) {
 			return ResponseEntity.notFound().build();
 		}
-		
-		dentista.setIdDentista(id);
-		dentistaRepository.save(dentista);
 		return ResponseEntity.ok().build();		
 		
 	}
@@ -63,10 +65,9 @@ public class DentistaController {
 	@DeleteMapping("/del/{id}")
 	public ResponseEntity<Dentista> deleteDentista(@PathVariable Integer id){
 		
-		if(!dentistaRepository.existsById(id)) {
+		if(!dentistaService.deleteDentista(id)) {
 			return ResponseEntity.notFound().build();
 		}else {
-			dentistaRepository.deleteById(id);
 			return ResponseEntity.ok().build();
 		}
 		
