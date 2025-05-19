@@ -2,6 +2,7 @@ package com.sorrisoperfeito.model;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,5 +43,5 @@ public class Consulta {
 	@JoinTable(name = "consultas_servicos",
 			   joinColumns = @JoinColumn(name = "idConsulta"),
 			   inverseJoinColumns = @JoinColumn(name = "idServico"))
-	private HashSet<Servico> servicos = new HashSet<>();
+	private Set<Servico> servicos = new HashSet<>();
 }

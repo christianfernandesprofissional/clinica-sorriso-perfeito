@@ -2,6 +2,8 @@ package com.sorrisoperfeito.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +32,7 @@ public class Dentista {
 	private String especialidade;
 	
 	@Setter(value = AccessLevel.NONE)
+	@JsonIgnore
 	@OneToMany(mappedBy = "dentista", cascade = CascadeType.ALL)
 	private List<Consulta> consultas;
 	

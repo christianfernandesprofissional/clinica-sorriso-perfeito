@@ -3,6 +3,8 @@ package com.sorrisoperfeito.model;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,6 +37,7 @@ public class Paciente {
 	private String profissao; 
 	
 	@Setter(value = AccessLevel.NONE)
+	@JsonIgnore
 	@OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL)
 	private List<Consulta> consultas;
 	

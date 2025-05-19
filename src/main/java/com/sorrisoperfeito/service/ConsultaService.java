@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.sorrisoperfeito.exceptions.CadastroException;
 import com.sorrisoperfeito.model.Consulta;
+import com.sorrisoperfeito.model.Paciente;
 import com.sorrisoperfeito.repository.ConsultaRepository;
 
 @Service
@@ -17,11 +18,18 @@ public class ConsultaService {
 	private ConsultaRepository consultaRepository; 
 	
 	public List<Consulta> findAll(){
-		return consultaRepository.findAll();
+		List<Consulta> consultas = consultaRepository.findAll();
+		
+		
+		return consultas;
 	}
 	
 	public Optional<Consulta> findById(Integer id) {
 		return consultaRepository.findById(id);
+	}
+	
+	public List<Consulta> findByPaciente(Paciente paciente){
+		return consultaRepository.findByPaciente(paciente);
 	}
 	
 	public Boolean existsById(Integer id) {
@@ -40,7 +48,7 @@ public class ConsultaService {
 		if(!consultaRepository.existsById(id)) {
 			return false;
 		}
-		consulta.getIdConsulta();
+		consulta.setIdConsulta(id);
 		consultaRepository.save(consulta);
 		return true;
 	}
@@ -53,4 +61,5 @@ public class ConsultaService {
 		consultaRepository.deleteById(id);
 		return true;
 	}
+	
 }

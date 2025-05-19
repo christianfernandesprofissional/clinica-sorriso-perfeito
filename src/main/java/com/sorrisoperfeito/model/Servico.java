@@ -1,6 +1,9 @@
 package com.sorrisoperfeito.model;
 
 import java.util.HashSet;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +29,7 @@ public class Servico {
 	private Integer idServico; 
 	private String descricao;
 	
+	@JsonIgnore
 	@ManyToMany(mappedBy = "servicos")
-	private HashSet<Consulta> consultas = new HashSet<>();
+	private Set<Consulta> consultas = new HashSet<>();
 }
