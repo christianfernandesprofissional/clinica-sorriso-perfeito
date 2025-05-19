@@ -15,27 +15,27 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sorrisoperfeito.exceptions.CadastroException;
 import com.sorrisoperfeito.model.Paciente;
-import com.sorrisoperfeito.repository.PacienteRepository;
+import com.sorrisoperfeito.service.PacienteService;
 
 @RestController
 @RequestMapping("/pacientes")
 public class PacienteController {
 
 	@Autowired
-	private PacienteRepository pacienteRepository;	
+	private PacienteService pacienteService;	
 	
 	
 	@GetMapping
 	public ResponseEntity<List<Paciente>> findAll(){
-		List<Paciente> pacientes = pacienteRepository.findAll();
+		List<Paciente> pacientes = pacienteService.findAll();
 		return ResponseEntity.ok(pacientes);
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Paciente> findById(@PathVariable Integer id){
-		Optional<Paciente> paciente = pacienteRepository.findById(id);
-		
+		Optional<Paciente> paciente = pacienteService.findById(id);
 		if(paciente.isPresent()) {
 			return ResponseEntity.ok(paciente.get());
 		}else {
@@ -44,28 +44,33 @@ public class PacienteController {
 	}
 	
 	@PostMapping("/")
-	public ResponseEntity<Paciente> addPaciente(@RequestBody Paciente paciente){
-		Paciente p = pacienteRepository.save(paciente);
-		URI uri = URI.create("/pacientes/" + p.getIdPaciente());
-		return ResponseEntity.created(uri).build();
+	public ResponseEntity<Paciente> createPaciente(@RequestBody Paciente paciente) {
+		try {
+		 Paciente pacienteSalvo = pacienteService.createPaciente(paciente);
+		 URI location = URI.create("/pacientes/" + pacienteSalvo.getIdPaciente());
+		 return ResponseEntity.created(location).body(pacienteSalvo);
+		}catch(CadastroException e) {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<Paciente> updatePaciente(@PathVariable Integer id, @RequestBody Paciente paciente){
-		if(!pacienteRepository.existsById(id)) {
+		if(!pacienteService.updatePaciente(id, paciente)) {
 			return ResponseEntity.notFound().build();
 		}
-		paciente.setIdPaciente(id);
-		pacienteRepository.save(paciente);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok().build();		
+		
 	}
 	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Paciente> updatePaciente(@PathVariable Integer id){
-		if(!pacienteRepository.existsById(id)) {
+	@DeleteMapping("/del/{id}")
+	public ResponseEntity<Paciente> deletePaciente(@PathVariable Integer id){
+		
+		if(!pacienteService.deletePaciente(id)) {
 			return ResponseEntity.notFound().build();
+		}else {
+			return ResponseEntity.ok().build();
 		}
-		pacienteRepository.deleteById(id);
-		return ResponseEntity.ok().build();
+		
 	}
 }
