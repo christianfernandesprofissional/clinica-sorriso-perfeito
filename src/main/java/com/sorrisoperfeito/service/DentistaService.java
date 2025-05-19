@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.sorrisoperfeito.exceptions.CadastroException;
@@ -35,4 +36,22 @@ public class DentistaService {
 		return dentistaRepository.save(dentista);
 	}
 	
+	
+	public Boolean updateDentista(Integer id, Dentista dentista) {
+		if(!dentistaRepository.existsById(id)) {
+			return false;
+		}
+		dentista.setIdDentista(id);
+		dentistaRepository.save(dentista);
+		return true;
+	}
+	
+	public Boolean deleteDentista(Integer id) {
+		if(!dentistaRepository.existsById(id)) {
+			return false;
+		}
+		
+		dentistaRepository.deleteById(id);
+		return true;
+	}
 }
