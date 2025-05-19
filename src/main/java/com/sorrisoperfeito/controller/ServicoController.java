@@ -15,26 +15,27 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sorrisoperfeito.exceptions.CadastroException;
 import com.sorrisoperfeito.model.Servico;
-import com.sorrisoperfeito.repository.ServicoRepository;
+import com.sorrisoperfeito.service.ServicoService;
 
 @RestController
 @RequestMapping("/servicos")
 public class ServicoController {
 
 	@Autowired
-	private ServicoRepository servicoRepository;
+	private ServicoService servicoService;
 	
 	@GetMapping
 	public ResponseEntity<List<Servico>> findAll(){
-		List<Servico> servicos = servicoRepository.findAll();
+		List<Servico> servicos = servicoService.findAll();
 		
 		return ResponseEntity.ok(servicos);
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Servico> findById(@PathVariable Integer id){
-		Optional<Servico> servico = servicoRepository.findById(id);
+		Optional<Servico> servico = servicoService.findById(id);
 		
 		if(!servico.isPresent()) {
 			return ResponseEntity.notFound().build();
@@ -43,32 +44,36 @@ public class ServicoController {
 		}
 	}
 	
+
 	@PostMapping("/")
-	public ResponseEntity<Servico> createServico(@RequestBody Servico servico){
-		Servico servicoCriado = servicoRepository.save(servico);
-		URI uri = URI.create("/servicos/" + servicoCriado.getIdServico());
-		return ResponseEntity.created(uri).build();
+	public ResponseEntity<Servico> createServico(@RequestBody Servico servico) {
+		try {
+		 Servico servicoSalvo = servicoService.createServico(servico);
+		 URI location = URI.create("/servicos/" + servicoSalvo.getIdServico());
+		 return ResponseEntity.created(location).body(servicoSalvo);
+		}catch(CadastroException e) {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<Servico> updateServico(@PathVariable Integer id, @RequestBody Servico servico){
-		if(!servicoRepository.existsById(id)) {
+		if(!servicoService.updateServico(id, servico)) {
 			return ResponseEntity.notFound().build();
 		}
+		return ResponseEntity.ok().build();		
 		
-		servicoRepository.save(servico);
-		return ResponseEntity.ok().build();
 	}
 	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Servico> deleteById(@PathVariable Integer id){
-		if(!servicoRepository.existsById(id)) {
+	@DeleteMapping("/del/{id}")
+	public ResponseEntity<Servico> deleteServico(@PathVariable Integer id){
+		
+		if(!servicoService.deleteServico(id)) {
 			return ResponseEntity.notFound().build();
+		}else {
+			return ResponseEntity.ok().build();
 		}
 		
-		servicoRepository.deleteById(id);
-		return ResponseEntity.ok().build();
-			
 	}
 	
 }
