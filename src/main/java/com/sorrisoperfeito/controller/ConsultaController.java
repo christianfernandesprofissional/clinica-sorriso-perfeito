@@ -15,27 +15,29 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sorrisoperfeito.exceptions.CadastroException;
+import com.sorrisoperfeito.model.Consulta;
 import com.sorrisoperfeito.model.Consulta;
 import com.sorrisoperfeito.model.Servico;
-import com.sorrisoperfeito.repository.ConsultaRepository;
+import com.sorrisoperfeito.service.ConsultaService;
 
 @RestController
 @RequestMapping("/consultas")
 public class ConsultaController {
 
 	@Autowired
-	private ConsultaRepository consultaRepository;
+	private ConsultaService consultaService;
 	
 	@GetMapping
 	public ResponseEntity<List<Consulta>> findAll(){
-		List<Consulta> consultas = consultaRepository.findAll();
+		List<Consulta> consultas = consultaService.findAll();
 		
 		return ResponseEntity.ok(consultas);
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Consulta> findById(@PathVariable Integer id){
-		Optional<Consulta> consulta = consultaRepository.findById(id);
+		Optional<Consulta> consulta = consultaService.findById(id);
 		
 		if(!consulta.isPresent()) {
 			return ResponseEntity.notFound().build();
@@ -45,30 +47,33 @@ public class ConsultaController {
 	}
 	
 	@PostMapping("/")
-	public ResponseEntity<Consulta> createServico(@RequestBody Consulta consulta){
-		Consulta consultaCriada = consultaRepository.save(consulta);
-		URI uri = URI.create("/consultas/" + consultaCriada.getIdConsulta());
-		return ResponseEntity.created(uri).build();
+	public ResponseEntity<Consulta> createConsulta(@RequestBody Consulta consulta) {
+		try {
+		 Consulta consultaSalva = consultaService.createConsulta(consulta);
+		 URI location = URI.create("/consultas/" + consultaSalva.getIdConsulta());
+		 return ResponseEntity.created(location).body(consultaSalva);
+		}catch(CadastroException e) {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<Servico> updateServico(@PathVariable Integer id, @RequestBody Consulta consulta){
-		if(!consultaRepository.existsById(id)) {
+	public ResponseEntity<Consulta> updateConsulta(@PathVariable Integer id, @RequestBody Consulta consulta){
+		if(!consultaService.updateConsulta(id, consulta)) {
 			return ResponseEntity.notFound().build();
 		}
+		return ResponseEntity.ok().build();		
 		
-		consultaRepository.save(consulta);
-		return ResponseEntity.ok().build();
 	}
 	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Servico> deleteById(@PathVariable Integer id){
-		if(!consultaRepository.existsById(id)) {
+	@DeleteMapping("/del/{id}")
+	public ResponseEntity<Consulta> deleteConsulta(@PathVariable Integer id){
+		
+		if(!consultaService.deleteConsulta(id)) {
 			return ResponseEntity.notFound().build();
+		}else {
+			return ResponseEntity.ok().build();
 		}
 		
-		consultaRepository.deleteById(id);
-		return ResponseEntity.ok().build();
-			
 	}
 }
