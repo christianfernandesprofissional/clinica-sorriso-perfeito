@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sorrisoperfeito.cepapi.EnderecoDTO;
+import com.sorrisoperfeito.cepapi.PacienteDTO;
+import com.sorrisoperfeito.cepapi.ViaCepService;
 import com.sorrisoperfeito.exceptions.CadastroException;
+import com.sorrisoperfeito.model.Endereco;
 import com.sorrisoperfeito.model.Paciente;
 import com.sorrisoperfeito.service.PacienteService;
 
@@ -26,6 +30,8 @@ public class PacienteController {
 	@Autowired
 	private PacienteService pacienteService;	
 	
+	@Autowired
+	private ViaCepService cepService;
 	
 	@GetMapping
 	public ResponseEntity<List<Paciente>> findAll(){
@@ -44,8 +50,11 @@ public class PacienteController {
 	}
 	
 	@PostMapping("/")
-	public ResponseEntity<Paciente> createPaciente(@RequestBody Paciente paciente) {
+	public ResponseEntity<Paciente> createPaciente(@RequestBody PacienteDTO pacienteDto) {
 		try {
+		 EnderecoDTO enderecoDto = cepService.buscarPorCep(pacienteDto.getCep());
+		 Endereco endereco = new Endereco(enderecoDto);
+		 Paciente paciente = new Paciente(pacienteDto, endereco);
 		 Paciente pacienteSalvo = pacienteService.createPaciente(paciente);
 		 URI location = URI.create("/pacientes/" + pacienteSalvo.getIdPaciente());
 		 return ResponseEntity.created(location).body(pacienteSalvo);
@@ -55,7 +64,10 @@ public class PacienteController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<Paciente> updatePaciente(@PathVariable Integer id, @RequestBody Paciente paciente){
+	public ResponseEntity<Paciente> updatePaciente(@PathVariable Integer id, PacienteDTO pacienteDto){
+		 EnderecoDTO enderecoDto = cepService.buscarPorCep(pacienteDto.getCep());
+		 Endereco endereco = new Endereco(enderecoDto);
+		 Paciente paciente = new Paciente(pacienteDto, endereco);
 		if(!pacienteService.updatePaciente(id, paciente)) {
 			return ResponseEntity.notFound().build();
 		}

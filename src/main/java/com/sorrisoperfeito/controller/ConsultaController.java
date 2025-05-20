@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sorrisoperfeito.exceptions.CadastroException;
 import com.sorrisoperfeito.model.Consulta;
-import com.sorrisoperfeito.model.Consulta;
-import com.sorrisoperfeito.model.Servico;
 import com.sorrisoperfeito.service.ConsultaService;
 
 @RestController
